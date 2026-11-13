@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base target="_blank">
+<title>ARQUEODEX · Fichas de cerámica</title>
+<style>
+:root{color-scheme:light;--paper:#f5f2e9;--card:#fffdf8;--ink:#26362b;--muted:#546057;--green:#294c39;--pale:#e6ede3;--line:#dcded1;--clay:#963f25}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 "Instrument Sans",system-ui,sans-serif}button,input,textarea,select{font:inherit}button,a{touch-action:manipulation}a{color:var(--green)}[hidden]{display:none!important}
+.shell{max-width:1160px;margin:auto;padding:0 28px}.top{background:var(--green);color:white}.top .shell{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.brand{display:flex;gap:12px;align-items:center}.brand b{display:block;letter-spacing:.13em}.brand small{display:block;color:#dbe9de}.mark{font:29px Georgia;color:#f7dbbe}
+nav{display:flex;gap:6px;flex-wrap:wrap}button,.button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:8px 15px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);cursor:pointer;text-decoration:none;font-weight:650}.top button,.top a{color:white;background:transparent;border-color:#a7bfad}.top [aria-current="page"]{background:#ebf1e7;color:var(--green)}button:hover,.button:hover{filter:brightness(.95)}button:disabled{opacity:.55;cursor:wait}button.primary{background:var(--green);color:white;border-color:var(--green)}:focus-visible{outline:3px solid #b15e3c;outline-offset:3px}
+.intro{padding:28px 0 16px;display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}h1,h2{font-family:"Instrument Serif",Georgia,serif;line-height:1.05;font-weight:500;margin:0}h1{font-size:clamp(2rem,5vw,3.3rem)}h2{font-size:clamp(1.65rem,4vw,2.25rem)}p{margin:7px 0 0;color:var(--muted)}#status{min-height:26px;margin:0 0 12px;font-size:.89rem;color:var(--green)}#status.error{color:#982d22}
+.layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:23px;box-shadow:0 12px 32px #3043330b}.steps{padding:10px;align-self:start;display:grid;gap:4px}.steps button{text-align:left;justify-content:start;gap:10px;border-color:transparent;background:transparent;font-size:.9rem}.steps [aria-current="step"]{background:var(--pale);color:var(--green);border-color:#c8d7c8}.steps span{border-radius:50%;display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border:1px solid #b5c6b5;font-size:.77rem}.progress{font-size:.8rem;font-weight:700;color:var(--clay);margin:0 0 8px}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}.wide{grid-column:1/-1}.field{min-width:0}.field>label,legend{display:block;margin-bottom:5px;font-weight:650;font-size:.91rem}input:not([type=checkbox]),textarea,select{min-width:0;width:100%;border:1px solid #bfc9bc;border-radius:8px;background:white;color:var(--ink);padding:9px 10px;min-height:44px}textarea{min-height:105px;resize:vertical}fieldset{border:0;padding:0;margin:0}.checks,.actions,.tools,.photos{display:flex;gap:8px;flex-wrap:wrap}.checks label{padding:7px 10px;border:1px solid var(--line);border-radius:8px}.checks input{accent-color:var(--green)}.hint{font-size:.85rem}.actions{justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}#clear{margin-right:auto}.photos{margin-top:8px}.photos img{height:80px;width:90px;object-fit:cover;border-radius:8px}.photos a{overflow-wrap:anywhere}.tools{margin:15px 0;align-items:center}.tools input,.tools select{width:min(100%,300px)}.table{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}td button{min-height:36px;padding:4px 8px;margin:2px}.bars{list-style:none;padding:0}.bars li{margin:12px 0}.bars progress{display:block;width:100%;accent-color:var(--green)}main{padding-bottom:36px}
+@media(max-width:760px){.shell{padding-left:14px;padding-right:14px}.top .shell{padding-top:10px;padding-bottom:10px}.layout{grid-template-columns:1fr;gap:10px}.steps{display:flex;overflow:auto}.steps button{flex:0 0 auto}.card{padding:16px}}@media(max-width:480px){.fields{grid-template-columns:1fr}.intro{padding-top:20px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="shell"><div class="brand"><span class="mark" aria-hidden="true">◈</span><div><b>ARQUEODEX</b><small>Caracterización de cerámica</small></div></div><nav aria-label="Vistas"><button data-view="formView" aria-current="page">Registro</button><button data-view="inventory">Inventario</button><button data-view="analysis">Estadísticas</button></nav></div></header>
+<main class="shell">
+<div class="intro"><div><h1>Fichas de cerámica</h1><p>Registra una pieza o fragmento y consulta tu inventario.</p></div><a class="button" id="sheetLink" hidden rel="noopener">Abrir Google Sheets ↗</a></div>
+<p id="status" role="status" aria-live="polite"></p>
+<section id="formView" class="layout" aria-label="Registro"><nav id="steps" class="card steps" aria-label="Secciones de la ficha"></nav>
+<form id="form" class="card" novalidate>
+<div id="cards"></div>
+<div class="actions"><button type="button" id="clear">Limpiar</button><button type="button" id="back">Anterior</button><button type="button" id="next" class="primary">Siguiente</button><button type="submit" id="save" class="primary">Guardar ficha</button></div>
+</form></section>
+<section id="inventory" class="card" hidden><h2>Inventario</h2><p id="inventoryCount"></p><div class="tools"><input id="search" type="search" placeholder="Código, sitio, forma…" aria-label="Buscar en el inventario"><button id="export">Exportar CSV</button><button id="backup">Exportar respaldo</button><button id="import">Importar respaldo</button><input id="backupFile" type="file" accept=".json,application/json" hidden></div><div class="table" id="inventoryTable"></div></section>
+<section id="analysis" class="card" hidden><h2>Estadísticas por variable</h2><div class="tools"><label for="variable">Variable</label><select id="variable"></select></div><p id="analysisCount"></p><ul class="bars" id="bars"></ul></section>
+</main>
+<script>
+const sections=[
+{name:'1. Procedencia',fields:[['numero_inventario','Número de inventario','text'],['ubicacion','Ubicación','text'],['sitio','Sitio','text'],['sector','Sector','text'],['subsector','Subsector','text'],['ue','UE','text'],['capa','Capa','text'],['contexto','Contexto','text'],['bolsa','Bolsa','text']]},
+{name:'2. Análisis morfológico',fields:[['parte_vasija','Parte de la vasija','select','Borde|Cuerpo|Base|Asa|Soporte|Fragmento indeterminado'],['tipo_borde','Tipo de borde','select','Evertido|Invertido|Recto|Directo|Engrosado|Adelgazado|Ausente|Indeterminado'],['tipo_labio','Tipo de labio','select','Redondeado|Plano|Biselado|Apuntado|Engrosado|Adelgazado|Indeterminado'],['tipo_asa','Tipo de asa','select','Cinta|Cinta vertical|Cinta horizontal|Mamelón|Anular|De puente|No presenta|Indeterminado'],['clase_asa','Clase de asa','select','Vertical|Horizontal|Oblicua|En arco|Maciza|Perforada|Indeterminada'],['ubicacion_asa','Ubicación de la asa','select','Vertical|Horizontal|Superior|Lateral|Cuerpo|Indeterminada'],['forma_base','Forma de base','select','Plana|Convexa|Cóncava|Anular|Pedestal|Apuntada|Indeterminada'],['tipo_soporte','Tipo de soporte','select','Trípode|Anular|Pedestal|Cónico|Mamiforme|No presenta|Indeterminado'],['forma_cuerpo','Formas del cuerpo de la vasija','select','Globular|Subglobular|Elipsoide|Cilíndrico|Troncocónico|Hemisférico|Carinado|Compuesto|Indeterminado'],['forma_entera','Forma de vasija entera','select','Abierta|Cerrada|Restringida|No restringida|Compuesta|Indeterminada'],['tipo_vasija','Tipo de vasija','select','Olla|Cuenco|Plato|Jarra|Cántaro|Botella|Vaso|Taza|Tinaja|Indeterminada'],['diametro','Diámetro (mm)','number'],['angulo_boca','Ángulo de inclinación de la boca (°)','number']]},
+{name:'3. Análisis decorativo',fields:[['ubicacion_decoracion','Ubicación de la decoración','select','Interior|Exterior|Interior y exterior|Borde|Labio|Cuerpo|No presenta'],['naturaleza_colores','Naturaleza de los colores','select','Pigmento mineral|Pigmento orgánico|Engobe|Pintura|No presenta|Indeterminada'],['tecnica_interior','Técnica: interior','select','Pintura|Incisión|Excisión|Modelado|Aplicación|Impresión|Bruñido|No presenta'],['tecnica_exterior','Técnica: exterior','select','Pintura|Incisión|Excisión|Modelado|Aplicación|Impresión|Bruñido|No presenta'],['motivo_interior','Motivo: interior','select','Geométrico|Lineal|Banda|Punto|Zoomorfo|Antropomorfo|Fitomorfo|Abstracto|No presenta'],['motivo_exterior','Motivo: exterior','select','Geométrico|Lineal|Banda|Punto|Zoomorfo|Antropomorfo|Fitomorfo|Abstracto|No presenta'],['color_interior_decoracion','Color: interior','text'],['color_exterior_decoracion','Color: exterior','text']]},
+{name:'4. Análisis de tratamiento de superficie',fields:[['munsell_interior','Color Munsell: interior','munsell'],['munsell_exterior','Color Munsell: exterior','munsell'],['condicion_interior','Condición de superficie: interior','select','Bueno|Regular|Malo|Erosionado|Pulverulento|Desgastado|Concreciones|Indeterminado'],['condicion_exterior','Condición de superficie: exterior','select','Bueno|Regular|Malo|Erosionado|Pulverulento|Desgastado|Concreciones|Indeterminado'],['tratamiento_interior','Tratamiento: interior','select','Alisado|Pulido|Bruñido|Engobado|Pintado|Sin tratamiento|Indeterminado'],['tratamiento_exterior','Tratamiento: exterior','select','Alisado|Pulido|Bruñido|Engobado|Pintado|Sin tratamiento|Indeterminado']]},
+{name:'5. Pasta',fields:[['tamano_antiplastico','Tamaño del antiplástico','select','Muy fino|Fino|Medio|Grueso|Muy grueso|Variable|Indeterminado'],['color_pasta','Color de pasta','munsell'],['coccion','Cocción','select','Oxidante|Reducida|Irregular|Núcleo reducido|Mixta|Indeterminada'],['textura','Textura','select','Compacta|Semi-compacta|Porosa|Granular|Harinoso|Indeterminada'],['dureza','Dureza','select','Muy suave|Suave|Duro|Muy duro|Indefinido'],['grosor_pasta','Grosor de la pasta (mm)','number'],['tipo_temperante','Tipo de temperante','select','Cuarzo|Mica| feldespato|Roca triturada|Arena|Cerámica molida|Orgánico|Mixto|No identificado'],['porcentaje_antiplastico','Porcentaje de antiplástico (%)','number'],['tamano_particulas','Tamaño de partículas','select','Muy fino|Fino|Medio|Grueso|Muy grueso|Heterogéneo'],['forma_particulas','Forma de partículas','select','Angular|Subangular|Subredondeada|Redondeada|Mixta|Indeterminada'],['distribucion_antiplastico','Distribución de los antiplásticos','select','Homogénea|Heterogénea|Uniforme|Concentrada|Escasa|Dispersa|Indeterminada']]},
+{name:'6. Otros',fields:[['tipo_analisis','Tipo de análisis','checks','Microscopio digital|Macroscópico|Fotográfico|Dibujo|Petrográfico|Otro'],['foto','Fotografía(s)','file'],['dibujo','Dibujo / referencia','text'],['filiacion_cultural','Filiación cultural','text'],['grupo_pasta','Grupo de pasta','text'],['observaciones','Observaciones','textarea']]},
+{name:'7. Descripción general',fields:[['descripcion','Descripción','textarea']]}
+];
+const munsell=['10YR 7/4','10YR 7/3','7.5YR 7/4','7.5YR 6/6','10YR 6/2','5Y 6/1','10YR 6/4','5YR 6/6','7.5Y 5/2','10YR 5/2','N 2.5','2.5Y 5/2','5YR 5/4','7.5YR 5/3','10YR 7/1','10R 5/6','2.5YR 6/8'];
+const $=id=>document.getElementById(id);
+const fields=sections.flatMap(section=>section.fields);
+const cloud=typeof google!=='undefined'&&Boolean(google.script?.run);
+const names=['Procedencia','Morfología','Decoración','Superficie','Pasta','Documentación','Descripción'];
+const help=[
+ 'Ubica el hallazgo. En UE puedes escribir el código de la unidad estratigráfica, por ejemplo UE-014.',
+ 'Identifica la parte conservada. Si solo tienes un borde, puedes dejar en blanco los campos de asa y base.',
+ 'Describe por separado la decoración interior y exterior. Elige una sugerencia o escribe tu propia categoría.',
+ 'Compara ambas caras. Para el color Munsell, usa la notación de tu carta, por ejemplo 10YR 7/4.',
+ 'Registra el grosor en milímetros y estima el porcentaje de inclusiones en una escala de 0 a 100.',
+ 'Marca los análisis realizados. Puedes adjuntar hasta seis fotos por pieza.',
+ 'Resume los rasgos que ayudan a identificar la pieza. Puedes volver a cualquier sección antes de guardar.'
+];
+let records=[], step=0, photos=[], editing=null, draftId=null, loadingPhotos=null, busy=false, ready=!cloud, view='formView';
+const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
+function call(name,...args){
+ return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](...args));
+}
+function field([key,label,type,opts='']){
+ const id='f_'+key;
+ if(type==='checks')return '<fieldset class="field wide"><legend>'+esc(label)+'</legend><div class="checks">'+opts.split('|').map(v=>'<label><input type="checkbox" name="'+id+'" value="'+esc(v)+'"> '+esc(v)+'</label>').join('')+'</div></fieldset>';
+ let control;
+ if(key==='numero_inventario')control='<input id="'+id+'" readonly placeholder="Se asigna al guardar">';
+ else if(type==='file')control='<input id="'+id+'" type="file" accept="image/*" multiple><div class="photos" id="photos"></div><button type="button" id="removePhotos" hidden>Quitar fotos</button>';
+ else if(type==='textarea')control='<textarea id="'+id+'" rows="4"></textarea>';
+ else if(type==='number')control='<input id="'+id+'" type="number" step="any" '+(key==='angulo_boca'?'':'min="0"')+(key==='porcentaje_antiplastico'?' max="100"':'')+'>';
+ else if(type==='select'||type==='munsell'){
+  const values=type==='munsell'?munsell:opts.split('|');
+  control='<input id="'+id+'" list="list_'+id+'" placeholder="Elige o escribe una categoría" autocomplete="off"><datalist id="list_'+id+'">'+values.map(v=>'<option value="'+esc(v.trim())+'">').join('')+'</datalist>';
+ } else control='<input id="'+id+'" type="text">';
+ return '<div class="field '+(['textarea','file'].includes(type)?'wide':'')+'"><label for="'+id+'">'+esc(label)+'</label>'+control+'</div>';
+}
+function build(){
+ $('steps').innerHTML=names.map((name,i)=>'<button type="button" data-step="'+i+'"><span>'+(i+1)+'</span>'+name+'</button>').join('');
+ $('cards').innerHTML=sections.map((section,i)=>'<section class="step"><div class="progress">Paso '+(i+1)+' de '+sections.length+'</div><h2 tabindex="-1">'+esc(section.name.replace(/^\d+\.\s*/,''))+'</h2><p>'+esc(help[i])+'</p><div class="fields">'+section.fields.map(field).join('')+'</div></section>').join('');
+ $('variable').innerHTML=fields.filter(([key])=>key!=='foto').map(([key,label])=>'<option value="'+key+'">'+esc(label)+'</option>').join('');
+ $('variable').value='parte_vasija';
+ setStep(0);
+}
+function setStep(index,focus=false){
+ step=index;
+ document.querySelectorAll('.step').forEach((el,i)=>{el.hidden=i!==index;if(focus&&i===index)el.querySelector('h2').focus();});
+ $('steps').querySelectorAll('button').forEach((el,i)=>{if(i===index)el.setAttribute('aria-current','step');else el.removeAttribute('aria-current');});
+ $('back').hidden=index===0;
+ $('next').hidden=index===sections.length-1;
+ $('save').hidden=index!==sections.length-1;
+}
+function show(id){
+ view=id;
+ for(const section of ['formView','inventory','analysis'])$(section).hidden=section!==id;
+ document.querySelectorAll('[data-view]').forEach(button=>{if(button.dataset.view===id)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
+ if(id==='inventory')renderInventory();
+ if(id==='analysis')renderAnalysis();
+}
+function renderPhotos(){
+ $('photos').replaceChildren();
+ for(const photo of photos){
+  if(typeof photo.data==='string'&&/^data:image\/(?:jpeg|png|webp);base64,/.test(photo.data)){
+   const img=new Image();img.src=photo.data;img.alt=photo.name;$('photos').append(img);
+  }else if(typeof photo.url==='string'&&/^https:\/\/drive\.google\.com\/open\?id=[\w-]+$/.test(photo.url)){
+   const link=document.createElement('a');link.href=photo.url;link.rel='noopener';link.textContent=photo.name;$('photos').append(link);
+  }
+ }
+ $('removePhotos').hidden=!photos.length;
+}
+async function readPhoto(file){
+ const url=URL.createObjectURL(file);
+ try{
+  const image=new Image();image.src=url;await image.decode();
+  const ratio=Math.min(1,1400/Math.max(image.width,image.height));
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.max(1,Math.round(image.width*ratio));canvas.height=Math.max(1,Math.round(image.height*ratio));
+  canvas.getContext('2d').drawImage(image,0,0,canvas.width,canvas.height);
+  return {name:file.name,data:canvas.toDataURL('image/jpeg',.75)};
+ }finally{URL.revokeObjectURL(url);}
+}
+function reset(){
+ $('form').reset();editing=null;draftId=null;photos=[];loadingPhotos=null;
+ $('save').textContent='Guardar ficha';renderPhotos();setStep(0);
+}
+function edit(id){
+ if(busy)return;
+ const record=records.find(item=>item.id===id);if(!record)return;
+ reset();editing=id;photos=record.foto||[];
+ for(const [key,,type] of fields){
+  if(type==='checks')document.querySelectorAll('[name=f_'+key+']').forEach(box=>box.checked=(record[key]||[]).includes(box.value));
+  else if(type!=='file')$('f_'+key).value=record[key]??'';
+ }
+ $('save').textContent='Guardar cambios';renderPhotos();show('formView');setStep(0,true);status('Editando '+record.numero_inventario+'.');
+}
+function newId(){return globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);}
+function saveLocal(next){
+ localStorage.setItem('arqueodex_guiado_v1',JSON.stringify(next));
+}
+function setBusy(value){
+ busy=value;
+ document.querySelectorAll('#form input,#form textarea,#form button,#inventory button').forEach(el=>el.disabled=value);
+}
+function readRecord(){
+ const data={};
+ for(const [key,,type] of fields){
+  if(type==='file')data[key]=photos;
+  else if(type==='checks')data[key]=[...document.querySelectorAll('[name=f_'+key+']:checked')].map(box=>box.value);
+  else data[key]=$('f_'+key).value.trim();
+ }
+ return data;
+}
+async function save(event){
+ event.preventDefault();
+ if(busy||!ready)return;
+ if(step!==sections.length-1){setStep(step+1,true);return;}
+ const invalid=$('form').querySelector(':invalid');
+ if(invalid){setStep([...document.querySelectorAll('.step')].indexOf(invalid.closest('.step')));invalid.reportValidity();return;}
+ setBusy(true);
+ try{
+  if(loadingPhotos)await loadingPhotos;
+  const data=readRecord();
+  if(!fields.some(([key])=>key!=='numero_inventario'&&data[key]?.length)){status('Completa al menos un campo antes de guardar.',true);return;}
+  const old=records.find(r=>r.id===editing);
+  data.id=editing||(draftId??=newId());
+  let saved;
+  if(cloud){
+   status('Guardando ficha en Google Sheets…');
+   saved=await call('guardarFicha',data,old?.updated||'');
+  }else{
+   const max=records.reduce((n,r)=>Math.max(n,Number(r.numero_inventario.match(/^CER-(\d+)$/)?.[1]||0)),0);
+   saved={...data,numero_inventario:old?.numero_inventario||'CER-'+String(max+1).padStart(4,'0'),updated:new Date().toISOString()};
+   saveLocal([...records.filter(r=>r.id!==saved.id),saved]);
+  }
+  records=[...records.filter(r=>r.id!==saved.id),saved];
+  reset();
+  status(saved.numero_inventario+(cloud?' guardada en Google Sheets.':' guardada en este navegador.'));
+  if(view==='inventory')renderInventory();
+  if(view==='analysis')renderAnalysis();
+ }catch(error){status('Error al guardar. '+error.message,true);}
+ finally{setBusy(false);}
+}
+function asText(value){return Array.isArray(value)?value.map(v=>typeof v==='object'?(v.url||v.name):v).join(' | '):String(value??'');}
+function filtered(){
+ const needle=$('search').value.trim().toLocaleLowerCase('es');
+ return [...records].reverse().filter(r=>fields.some(([key])=>asText(r[key]).toLocaleLowerCase('es').includes(needle)));
+}
+function renderInventory(){
+ const found=filtered();$('inventoryCount').textContent=found.length+' de '+records.length+' fichas';
+ if(!found.length){$('inventoryTable').innerHTML='<p>No hay fichas para mostrar.</p>';return;}
+ const cols=['numero_inventario','sitio','sector','parte_vasija','tipo_vasija'];
+ $('inventoryTable').innerHTML='<table><thead><tr>'+cols.map(k=>'<th scope="col">'+esc(fields.find(f=>f[0]===k)[1])+'</th>').join('')+'<th scope="col">Acciones</th></tr></thead><tbody>'+found.map(r=>'<tr>'+cols.map(k=>'<td>'+esc(asText(r[k])||'—')+'</td>').join('')+'<td><button data-edit="'+esc(r.id)+'">Ver o editar</button><button data-delete="'+esc(r.id)+'">Eliminar</button></td></tr>').join('')+'</tbody></table>';
+}
+function renderAnalysis(){
+ const key=$('variable').value;
+ const counts=new Map();let total=0;
+ for(const r of records){
+  const values=[...new Set((Array.isArray(r[key])?r[key]:[r[key]]).filter(v=>v!==''&&v!=null))];
+  if(values.length)total++;
+  for(const val of values)counts.set(val,(counts.get(val)||0)+1);
+ }
+ $('analysisCount').textContent=total?total+' fichas con datos para esta variable.':'Aún no hay datos para esta variable.';
+ $('bars').innerHTML=[...counts].sort((a,b)=>b[1]-a[1]).map(([label,n])=>'<li><span>'+esc(label)+' · '+n+' ('+Math.round(n/total*100)+' %)</span><progress aria-label="'+esc(label)+'" value="'+n+'" max="'+total+'"></progress></li>').join('');
+}
+function download(content,name,type){
+ const url=URL.createObjectURL(new Blob([content],{type}));
+ const link=document.createElement('a');link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function csv(){
+ const cell=value=>'"'+asText(value).replace(/^[\s]*[=+@-]/,m=>"'"+m).replaceAll('"','""')+'"';
+ download('\ufeff'+[fields.map(f=>cell(f[1])).join(';'),...filtered().map(r=>fields.map(([key])=>cell(r[key])).join(';'))].join('\r\n'),'arqueodex.csv','text/csv;charset=utf-8');
+}
+async function remove(id){
+ if(!ready||busy)return;
+ const r=records.find(item=>item.id===id);
+ if(!r||!confirm('¿Eliminar la ficha '+r.numero_inventario+'?'))return;
+ setBusy(true);
+ try{
+  const next=records.filter(item=>item.id!==id);
+  if(cloud)await call('eliminarFicha',id,r.updated);else saveLocal(next);
+  records=next;if(editing===id)reset();renderInventory();status('Ficha eliminada.');
+ }catch(error){status(error.message,true);}
+ finally{setBusy(false);}
+}
+async function importBackup(file){
+ if(!file||busy||!ready)return;
+ setBusy(true);
+ try{
+  const {records:incoming}=JSON.parse(await file.text());
+  if(!Array.isArray(incoming)||incoming.some(r=>!r||typeof r.id!=='string'||typeof r.numero_inventario!=='string'))throw Error('El archivo no contiene un respaldo compatible.');
+  const current=new Set(records.map(r=>r.id));
+  const fresh=incoming.filter(r=>{if(current.has(r.id))return false;current.add(r.id);return true;});
+  if(!fresh.length){status('El respaldo no contiene fichas nuevas.');return;}
+  if(!confirm('¿Agregar '+fresh.length+' fichas al inventario?'))return;
+  if(cloud){
+   for(const [index,row] of fresh.entries()){
+    status('Importando ficha '+(index+1)+' de '+fresh.length+'…');
+    records.push(await call('guardarFicha',row,'',true));
+   }
+  }else{saveLocal([...records,...fresh]);records.push(...fresh);}
+  status('Se importaron '+fresh.length+' fichas.');
+ }catch(error){status('Importación interrumpida. '+error.message,true);}
+ finally{setBusy(false);renderInventory();}
+}
+async function init(){
+ build();
+ document.querySelectorAll('[data-view]').forEach(button=>button.onclick=()=>show(button.dataset.view));
+ $('steps').onclick=event=>{const button=event.target.closest('[data-step]');if(button)setStep(Number(button.dataset.step),true);};
+ $('back').onclick=()=>setStep(step-1,true);$('next').onclick=()=>setStep(step+1,true);
+ $('clear').onclick=()=>{if(confirm('¿Descartar los cambios de la ficha?'))reset();};
+ $('form').onsubmit=save;
+ $('search').oninput=renderInventory;
+ $('variable').onchange=renderAnalysis;
+ $('inventoryTable').onclick=event=>{const button=event.target.closest('button');if(button?.dataset.edit)edit(button.dataset.edit);if(button?.dataset.delete)remove(button.dataset.delete);};
+ $('export').onclick=csv;
+ $('backup').onclick=()=>download(JSON.stringify({app:'ARQUEODEX',records},null,2),'respaldo_arqueodex.json','application/json');
+ $('import').onclick=()=>$('backupFile').click();
+ $('backupFile').onchange=event=>{importBackup(event.target.files[0]);event.target.value='';};
+ $('removePhotos').onclick=()=>{photos=[];loadingPhotos=null;$('f_foto').value='';renderPhotos();};
+ $('f_foto').onchange=event=>{
+  const files=[...event.target.files];if(!files.length)return;
+  if(files.length>6||files.some(file=>file.size>20*1024*1024)){status('Selecciona hasta seis fotos de máximo 20 MB cada una.',true);event.target.value='';return;}
+  const job=Promise.all(files.map(readPhoto)).then(result=>{if(loadingPhotos===job){photos=result;renderPhotos();status('Fotografías listas para guardar.');}});
+  loadingPhotos=job;
+  job.catch(()=>{if(loadingPhotos===job){event.target.value='';status('No se pudieron leer las fotos. Intenta con JPG o PNG.',true);}}).finally(()=>{if(loadingPhotos===job)loadingPhotos=null;});
+ };
+ if(cloud){
+  setBusy(true);status('Conectando con Google Sheets…');
+  try{const data=await call('cargarInventario');records=data.records;$('sheetLink').href=data.url;$('sheetLink').hidden=false;ready=true;status('Conectado a Google Sheets.');}
+  catch(error){status('Conexión pendiente. '+error.message,true);}
+  finally{setBusy(false);show(view);}
+ }else{
+  try{records=JSON.parse(localStorage.getItem('arqueodex_guiado_v1')||'[]');status('Vista local · Las fichas se guardan en este navegador.');}
+  catch(error){status('No se pudo cargar el inventario local. '+error.message,true);}
+ }
+}
+init();
+</script>
+</body>
+</html>
