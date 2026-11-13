@@ -74,6 +74,26 @@ function build(){
  $('variable').innerHTML=fields.filter(([key])=>key!=='foto').map(([key,label])=>'<option value="'+key+'">'+esc(label)+'</option>').join('');
  $('variable').value='parte_vasija';
  setStep(0);
+ addExamples();
+}
+function nextInventoryNumber(){
+ const maximum=records.reduce((n,record)=>Math.max(n,Number(String(record.numero_inventario||'').match(/^CER-(\d+)$/)?.[1]||0)),0);
+ return 'CER-'+String(maximum+1).padStart(4,'0');
+}
+function refreshInventoryNumber(){
+ if(!editing)$('f_numero_inventario').value=nextInventoryNumber();
+}
+function addExamples(){
+ const examples={ubicacion:'Depósito 1, estante B',sitio:'Sitio arqueológico A',sector:'Sector A',subsector:'A-02',ue:'UE-014',capa:'Capa III',contexto:'Relleno de unidad UE-014',bolsa:'B-025',diametro:'120',angulo_boca:'45',grosor_pasta:'6.5',porcentaje_antiplastico:'20',color_interior_decoracion:'Rojo oscuro',color_exterior_decoracion:'Crema',dibujo:'Lámina 03, dibujo 2',filiacion_cultural:'Por determinar',grupo_pasta:'GP-02',observaciones:'Erosión en la superficie exterior.',descripcion:'Fragmento de borde evertido, con engobe rojo exterior.'};
+ for(const [key,,type,options=''] of fields){
+  const input=$('f_'+key);
+  if(key==='numero_inventario'){input.placeholder='CER-0001';continue;}
+  const example=examples[key]||(type==='munsell'?'10YR 7/4':options.split('|')[0].trim());
+  if(type==='checks'||type==='file'){
+   const container=type==='checks'?document.querySelector('[name="f_'+key+'"]').closest('fieldset'):input.parentElement;
+   const hint=document.createElement('p');hint.className='hint';hint.textContent=type==='file'?'Ejemplo: foto general de la pieza y detalle del borde.':'Ejemplo: marca Macroscópico y Fotográfico si realizaste ambos análisis.';container.append(hint);
+  }else input.placeholder='Ej.: '+example;
+ }
 }
 function setStep(index,focus=false){
  step=index;
@@ -114,6 +134,7 @@ async function readPhoto(file){
 }
 function reset(){
  $('form').reset();editing=null;draftId=null;photos=[];loadingPhotos=null;
+ refreshInventoryNumber();
  $('save').textContent='Guardar ficha';renderPhotos();setStep(0);
 }
 function edit(id){
@@ -156,8 +177,7 @@ async function save(event){
   data.id=editing||(draftId??=newId());
   let saved;
   {
-   const max=records.reduce((n,r)=>Math.max(n,Number(r.numero_inventario.match(/^CER-(\d+)$/)?.[1]||0)),0);
-   saved={...data,numero_inventario:old?.numero_inventario||'CER-'+String(max+1).padStart(4,'0'),updated:new Date().toISOString()};
+   saved={...data,numero_inventario:old?.numero_inventario||nextInventoryNumber(),updated:new Date().toISOString()};
    await saveLocal([...records.filter(r=>r.id!==saved.id),saved]);
   }
   records=[...records.filter(r=>r.id!==saved.id),saved];
@@ -206,7 +226,7 @@ async function remove(id){
  try{
   const next=records.filter(item=>item.id!==id);
   await saveLocal(next);
-  records=next;if(editing===id)reset();renderInventory();status('Ficha eliminada.');
+  records=next;if(editing===id)reset();refreshInventoryNumber();renderInventory();status('Ficha eliminada.');
  }catch(error){status(error.message,true);}
  finally{setBusy(false);}
 }
@@ -220,7 +240,7 @@ async function importBackup(file){
   const fresh=incoming.filter(r=>{if(current.has(r.id))return false;current.add(r.id);return true;});
   if(!fresh.length){status('El respaldo no contiene fichas nuevas.');return;}
   if(!confirm('¿Agregar '+fresh.length+' fichas al inventario?'))return;
-  await saveLocal([...records,...fresh]);records.push(...fresh);
+  await saveLocal([...records,...fresh]);records.push(...fresh);refreshInventoryNumber();
   status('Se importaron '+fresh.length+' fichas.');
  }catch(error){status('Importación interrumpida. '+error.message,true);}
  finally{setBusy(false);renderInventory();}
@@ -251,7 +271,7 @@ async function init(){
  try{
   records=await storage('readonly',store=>store.get('records'));
   if(!records){records=JSON.parse(localStorage.getItem('arqueodex_guiado_v1')||'[]');await saveLocal(records);}
-  ready=true;status('Almacenamiento local listo.');
+  ready=true;refreshInventoryNumber();status('Almacenamiento local listo.');
  }catch(error){status('No se pudo abrir el almacenamiento. '+error.message,true);}
  finally{setBusy(false);}
 
@@ -312,4 +332,5 @@ if('serviceWorker' in navigator && location.protocol==='https:')navigator.servic
 </script>
 </body>
 </html>
+
 
