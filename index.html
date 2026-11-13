@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><base target="_blank">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ARQUEODEX · Fichas de cerámica</title>
 <style>
 :root{color-scheme:light;--paper:#f5f2e9;--card:#fffdf8;--ink:#26362b;--muted:#546057;--green:#294c39;--pale:#e6ede3;--line:#dcded1;--clay:#963f25}
@@ -12,22 +12,23 @@ nav{display:flex;gap:6px;flex-wrap:wrap}button,.button{display:inline-flex;align
 .layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:20px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:23px;box-shadow:0 12px 32px #3043330b}.steps{padding:10px;align-self:start;display:grid;gap:4px}.steps button{text-align:left;justify-content:start;gap:10px;border-color:transparent;background:transparent;font-size:.9rem}.steps [aria-current="step"]{background:var(--pale);color:var(--green);border-color:#c8d7c8}.steps span{border-radius:50%;display:grid;place-items:center;width:27px;height:27px;flex:0 0 27px;border:1px solid #b5c6b5;font-size:.77rem}.progress{font-size:.8rem;font-weight:700;color:var(--clay);margin:0 0 8px}
 .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:22px}.wide{grid-column:1/-1}.field{min-width:0}.field>label,legend{display:block;margin-bottom:5px;font-weight:650;font-size:.91rem}input:not([type=checkbox]),textarea,select{min-width:0;width:100%;border:1px solid #bfc9bc;border-radius:8px;background:white;color:var(--ink);padding:9px 10px;min-height:44px}textarea{min-height:105px;resize:vertical}fieldset{border:0;padding:0;margin:0}.checks,.actions,.tools,.photos{display:flex;gap:8px;flex-wrap:wrap}.checks label{padding:7px 10px;border:1px solid var(--line);border-radius:8px}.checks input{accent-color:var(--green)}.hint{font-size:.85rem}.actions{justify-content:flex-end;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}#clear{margin-right:auto}.photos{margin-top:8px}.photos img{height:80px;width:90px;object-fit:cover;border-radius:8px}.photos a{overflow-wrap:anywhere}.tools{margin:15px 0;align-items:center}.tools input,.tools select{width:min(100%,300px)}.table{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);vertical-align:top}td button{min-height:36px;padding:4px 8px;margin:2px}.bars{list-style:none;padding:0}.bars li{margin:12px 0}.bars progress{display:block;width:100%;accent-color:var(--green)}main{padding-bottom:36px}
 @media(max-width:760px){.shell{padding-left:14px;padding-right:14px}.top .shell{padding-top:10px;padding-bottom:10px}.layout{grid-template-columns:1fr;gap:10px}.steps{display:flex;overflow:auto}.steps button{flex:0 0 auto}.card{padding:16px}}@media(max-width:480px){.fields{grid-template-columns:1fr}.intro{padding-top:20px}}
-</style>
-</head>
+
+.step{border-top:6px solid var(--section);padding-top:16px}.step h2{color:var(--section)}.steps button{border-left:5px solid var(--section)}.steps [aria-current=step]{background:color-mix(in srgb,var(--section) 15%,white)}dialog{border:1px solid #ccc;border-radius:16px;max-width:90vw;width:420px}dialog::backdrop{background:#15251bea}#control{margin-top:20px}#control label{display:block;margin-top:12px}</style>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#294c39"></head>
 <body>
-<header class="top"><div class="shell"><div class="brand"><span class="mark" aria-hidden="true">◈</span><div><b>ARQUEODEX</b><small>Caracterización de cerámica</small></div></div><nav aria-label="Vistas"><button data-view="formView" aria-current="page">Registro</button><button data-view="inventory">Inventario</button><button data-view="analysis">Estadísticas</button></nav></div></header>
+<header class="top"><div class="shell"><div class="brand"><span class="mark" aria-hidden="true">◈</span><div><b>ARQUEODEX</b><small>Caracterización de cerámica</small></div></div><nav aria-label="Vistas"><button data-view="formView" aria-current="page">Registro</button><button data-view="inventory">Inventario</button><button data-view="analysis">Estadísticas</button><button data-view="control">Panel de control</button><button id="lockApp">Bloquear</button></nav></div></header>
 <main class="shell">
-<div class="intro"><div><h1>Fichas de cerámica</h1><p>Registra una pieza o fragmento y consulta tu inventario.</p></div><a class="button" id="sheetLink" hidden rel="noopener">Abrir Google Sheets ↗</a></div>
+<div class="intro"><div><h1>Fichas de cerámica</h1><p>Registra una pieza o fragmento y consulta tu inventario.</p></div></div>
 <p id="status" role="status" aria-live="polite"></p>
 <section id="formView" class="layout" aria-label="Registro"><nav id="steps" class="card steps" aria-label="Secciones de la ficha"></nav>
 <form id="form" class="card" novalidate>
 <div id="cards"></div>
 <div class="actions"><button type="button" id="clear">Limpiar</button><button type="button" id="back">Anterior</button><button type="button" id="next" class="primary">Siguiente</button><button type="submit" id="save" class="primary">Guardar ficha</button></div>
 </form></section>
-<section id="inventory" class="card" hidden><h2>Inventario</h2><p id="inventoryCount"></p><div class="tools"><input id="search" type="search" placeholder="Código, sitio, forma…" aria-label="Buscar en el inventario"><button id="export">Exportar CSV</button><button id="backup">Exportar respaldo</button><button id="import">Importar respaldo</button><input id="backupFile" type="file" accept=".json,application/json" hidden></div><div class="table" id="inventoryTable"></div></section>
+<section id="inventory" class="card" hidden><h2>Inventario</h2><p id="inventoryCount"></p><div class="tools"><input id="search" type="search" placeholder="Código, sitio, forma…" aria-label="Buscar en el inventario"><button id="excel">Descargar Excel</button><button id="export">Exportar CSV</button><button id="backup">Exportar respaldo</button><button id="import">Importar respaldo</button><input id="backupFile" type="file" accept=".json,application/json" hidden></div><div class="table" id="inventoryTable"></div></section>
 <section id="analysis" class="card" hidden><h2>Estadísticas por variable</h2><div class="tools"><label for="variable">Variable</label><select id="variable"></select></div><p id="analysisCount"></p><ul class="bars" id="bars"></ul></section>
-</main>
-<script>
+<section id="control" class="card" hidden><h2>Panel de control</h2><p>Los ajustes se guardan en este navegador. El bloqueo de acceso es local y no cifra los datos.</p><label for="adminField">Campo</label><select id="adminField"></select><label for="adminLabel">Nombre visible</label><input id="adminLabel"><label for="adminOptions">Opciones sugeridas, una por línea</label><textarea id="adminOptions"></textarea><label><input type="checkbox" id="adminLocked"> Bloquear escritura de este campo</label><div class="tools"><button id="applyAdmin">Guardar ajustes</button><button id="password">Crear o cambiar contraseña</button></div></section></main><dialog id="gate"><h2>Desbloquear ARQUEODEX</h2><form id="unlockForm"><p>Introduce la contraseña de este navegador.</p><input id="unlockPassword" type="password" autocomplete="current-password" aria-label="Contraseña" required><p id="unlockError" role="alert"></p><button type="submit">Desbloquear</button></form></dialog>
+<script src="jszip.min.js"></script><script>
 const sections=[
 {name:'1. Procedencia',fields:[['numero_inventario','Número de inventario','text'],['ubicacion','Ubicación','text'],['sitio','Sitio','text'],['sector','Sector','text'],['subsector','Subsector','text'],['ue','UE','text'],['capa','Capa','text'],['contexto','Contexto','text'],['bolsa','Bolsa','text']]},
 {name:'2. Análisis morfológico',fields:[['parte_vasija','Parte de la vasija','select','Borde|Cuerpo|Base|Asa|Soporte|Fragmento indeterminado'],['tipo_borde','Tipo de borde','select','Evertido|Invertido|Recto|Directo|Engrosado|Adelgazado|Ausente|Indeterminado'],['tipo_labio','Tipo de labio','select','Redondeado|Plano|Biselado|Apuntado|Engrosado|Adelgazado|Indeterminado'],['tipo_asa','Tipo de asa','select','Cinta|Cinta vertical|Cinta horizontal|Mamelón|Anular|De puente|No presenta|Indeterminado'],['clase_asa','Clase de asa','select','Vertical|Horizontal|Oblicua|En arco|Maciza|Perforada|Indeterminada'],['ubicacion_asa','Ubicación de la asa','select','Vertical|Horizontal|Superior|Lateral|Cuerpo|Indeterminada'],['forma_base','Forma de base','select','Plana|Convexa|Cóncava|Anular|Pedestal|Apuntada|Indeterminada'],['tipo_soporte','Tipo de soporte','select','Trípode|Anular|Pedestal|Cónico|Mamiforme|No presenta|Indeterminado'],['forma_cuerpo','Formas del cuerpo de la vasija','select','Globular|Subglobular|Elipsoide|Cilíndrico|Troncocónico|Hemisférico|Carinado|Compuesto|Indeterminado'],['forma_entera','Forma de vasija entera','select','Abierta|Cerrada|Restringida|No restringida|Compuesta|Indeterminada'],['tipo_vasija','Tipo de vasija','select','Olla|Cuenco|Plato|Jarra|Cántaro|Botella|Vaso|Taza|Tinaja|Indeterminada'],['diametro','Diámetro (mm)','number'],['angulo_boca','Ángulo de inclinación de la boca (°)','number']]},
@@ -40,7 +41,6 @@ const sections=[
 const munsell=['10YR 7/4','10YR 7/3','7.5YR 7/4','7.5YR 6/6','10YR 6/2','5Y 6/1','10YR 6/4','5YR 6/6','7.5Y 5/2','10YR 5/2','N 2.5','2.5Y 5/2','5YR 5/4','7.5YR 5/3','10YR 7/1','10R 5/6','2.5YR 6/8'];
 const $=id=>document.getElementById(id);
 const fields=sections.flatMap(section=>section.fields);
-const cloud=typeof google!=='undefined'&&Boolean(google.script?.run);
 const names=['Procedencia','Morfología','Decoración','Superficie','Pasta','Documentación','Descripción'];
 const help=[
  'Ubica el hallazgo. En UE puedes escribir el código de la unidad estratigráfica, por ejemplo UE-014.',
@@ -51,12 +51,9 @@ const help=[
  'Marca los análisis realizados. Puedes adjuntar hasta seis fotos por pieza.',
  'Resume los rasgos que ayudan a identificar la pieza. Puedes volver a cualquier sección antes de guardar.'
 ];
-let records=[], step=0, photos=[], editing=null, draftId=null, loadingPhotos=null, busy=false, ready=!cloud, view='formView';
+let records=[], step=0, photos=[], editing=null, draftId=null, loadingPhotos=null, busy=false, ready=false, view='formView';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function status(message,error=false){$('status').textContent=message;$('status').classList.toggle('error',error);}
-function call(name,...args){
- return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](...args));
-}
 function field([key,label,type,opts='']){
  const id='f_'+key;
  if(type==='checks')return '<fieldset class="field wide"><legend>'+esc(label)+'</legend><div class="checks">'+opts.split('|').map(v=>'<label><input type="checkbox" name="'+id+'" value="'+esc(v)+'"> '+esc(v)+'</label>').join('')+'</div></fieldset>';
@@ -88,7 +85,7 @@ function setStep(index,focus=false){
 }
 function show(id){
  view=id;
- for(const section of ['formView','inventory','analysis'])$(section).hidden=section!==id;
+ for(const section of ['formView','inventory','analysis','control'])$(section).hidden=section!==id;
  document.querySelectorAll('[data-view]').forEach(button=>{if(button.dataset.view===id)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});
  if(id==='inventory')renderInventory();
  if(id==='analysis')renderAnalysis();
@@ -102,7 +99,7 @@ function renderPhotos(){
    const link=document.createElement('a');link.href=photo.url;link.rel='noopener';link.textContent=photo.name;$('photos').append(link);
   }
  }
- $('removePhotos').hidden=!photos.length;
+ $('removePhotos').hidden=!photos.length; $('removePhotos').disabled=Boolean(settings.foto?.locked);
 }
 async function readPhoto(file){
  const url=URL.createObjectURL(file);
@@ -130,12 +127,10 @@ function edit(id){
  $('save').textContent='Guardar cambios';renderPhotos();show('formView');setStep(0,true);status('Editando '+record.numero_inventario+'.');
 }
 function newId(){return globalThis.crypto?.randomUUID?.()||Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);}
-function saveLocal(next){
- localStorage.setItem('arqueodex_guiado_v1',JSON.stringify(next));
-}
+async function saveLocal(next){await storage('readwrite',store=>store.put(next,'records'));}
 function setBusy(value){
  busy=value;
- document.querySelectorAll('#form input,#form textarea,#form button,#inventory button').forEach(el=>el.disabled=value);
+ document.querySelectorAll('#form input,#form textarea,#form button,#inventory button').forEach(el=>el.disabled=value||el.dataset.locked==='true');
 }
 function readRecord(){
  const data={};
@@ -160,17 +155,14 @@ async function save(event){
   const old=records.find(r=>r.id===editing);
   data.id=editing||(draftId??=newId());
   let saved;
-  if(cloud){
-   status('Guardando ficha en Google Sheets…');
-   saved=await call('guardarFicha',data,old?.updated||'');
-  }else{
+  {
    const max=records.reduce((n,r)=>Math.max(n,Number(r.numero_inventario.match(/^CER-(\d+)$/)?.[1]||0)),0);
    saved={...data,numero_inventario:old?.numero_inventario||'CER-'+String(max+1).padStart(4,'0'),updated:new Date().toISOString()};
-   saveLocal([...records.filter(r=>r.id!==saved.id),saved]);
+   await saveLocal([...records.filter(r=>r.id!==saved.id),saved]);
   }
   records=[...records.filter(r=>r.id!==saved.id),saved];
   reset();
-  status(saved.numero_inventario+(cloud?' guardada en Google Sheets.':' guardada en este navegador.'));
+  status(saved.numero_inventario+' guardada en este dispositivo.');
   if(view==='inventory')renderInventory();
   if(view==='analysis')renderAnalysis();
  }catch(error){status('Error al guardar. '+error.message,true);}
@@ -213,7 +205,7 @@ async function remove(id){
  setBusy(true);
  try{
   const next=records.filter(item=>item.id!==id);
-  if(cloud)await call('eliminarFicha',id,r.updated);else saveLocal(next);
+  await saveLocal(next);
   records=next;if(editing===id)reset();renderInventory();status('Ficha eliminada.');
  }catch(error){status(error.message,true);}
  finally{setBusy(false);}
@@ -228,12 +220,7 @@ async function importBackup(file){
   const fresh=incoming.filter(r=>{if(current.has(r.id))return false;current.add(r.id);return true;});
   if(!fresh.length){status('El respaldo no contiene fichas nuevas.');return;}
   if(!confirm('¿Agregar '+fresh.length+' fichas al inventario?'))return;
-  if(cloud){
-   for(const [index,row] of fresh.entries()){
-    status('Importando ficha '+(index+1)+' de '+fresh.length+'…');
-    records.push(await call('guardarFicha',row,'',true));
-   }
-  }else{saveLocal([...records,...fresh]);records.push(...fresh);}
+  await saveLocal([...records,...fresh]);records.push(...fresh);
   status('Se importaron '+fresh.length+' fichas.');
  }catch(error){status('Importación interrumpida. '+error.message,true);}
  finally{setBusy(false);renderInventory();}
@@ -260,17 +247,69 @@ async function init(){
   loadingPhotos=job;
   job.catch(()=>{if(loadingPhotos===job){event.target.value='';status('No se pudieron leer las fotos. Intenta con JPG o PNG.',true);}}).finally(()=>{if(loadingPhotos===job)loadingPhotos=null;});
  };
- if(cloud){
-  setBusy(true);status('Conectando con Google Sheets…');
-  try{const data=await call('cargarInventario');records=data.records;$('sheetLink').href=data.url;$('sheetLink').hidden=false;ready=true;status('Conectado a Google Sheets.');}
-  catch(error){status('Conexión pendiente. '+error.message,true);}
-  finally{setBusy(false);show(view);}
- }else{
-  try{records=JSON.parse(localStorage.getItem('arqueodex_guiado_v1')||'[]');status('Vista local · Las fichas se guardan en este navegador.');}
-  catch(error){status('No se pudo cargar el inventario local. '+error.message,true);}
- }
+ setBusy(true);
+ try{
+  records=await storage('readonly',store=>store.get('records'));
+  if(!records){records=JSON.parse(localStorage.getItem('arqueodex_guiado_v1')||'[]');await saveLocal(records);}
+  ready=true;status('Almacenamiento local listo.');
+ }catch(error){status('No se pudo abrir el almacenamiento. '+error.message,true);}
+ finally{setBusy(false);}
+
 }
+let database;
+async function storage(mode,action){
+ if(!database)database=await new Promise((resolve,reject)=>{const request=indexedDB.open('ARQUEODEX',1);request.onupgradeneeded=()=>request.result.createObjectStore('data');request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+ return new Promise((resolve,reject)=>{const transaction=database.transaction('data',mode);const request=action(transaction.objectStore('data'));transaction.oncomplete=()=>resolve(request.result);transaction.onerror=()=>reject(transaction.error);transaction.onabort=()=>reject(transaction.error||Error('Guardado interrumpido'));});
+}
+async function exportXlsx(){
+ try{
+ const xml=value=>String(value??'').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g,'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+ const rows=[fields.map(([key,label])=>settings[key]?.label||label),...records.map(r=>fields.map(([key])=>asText(r[key])))];
+ const zip=new JSZip();
+ zip.file('[Content_Types].xml','<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>');
+ zip.file('_rels/.rels','<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>');
+ zip.file('xl/workbook.xml','<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Inventario" sheetId="1" r:id="rId1"/></sheets></workbook>');
+ zip.file('xl/_rels/workbook.xml.rels','<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/></Relationships>');
+ zip.file('xl/worksheets/sheet1.xml','<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'+rows.map(row=>'<row>'+row.map(value=>'<c t="inlineStr"><is><t xml:space="preserve">'+xml(value)+'</t></is></c>').join('')+'</row>').join('')+'</sheetData></worksheet>');
+ const bytes=await zip.generateAsync({type:'uint8array'});
+ download(bytes,'ARQUEODEX.xlsx','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+ status('Excel descargado. Busca ARQUEODEX.xlsx en Descargas.');
+ }catch(error){status('No se pudo exportar. '+error.message,true);}
+}
+
+const palette=['#287551','#3266ad','#8a429d','#a36518','#247d86','#ac4f59','#6553a1'];
+let settings=JSON.parse(localStorage.getItem('arqueodex_fields')||'{}');
+async function passwordHash(value){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+function applySettings(){
+ fields.forEach(([key,label,type])=>{
+  const config=settings[key]||{};
+  const input=$('f_'+key);
+  const caption=document.querySelector('label[for="f_'+key+'"]');
+  if(caption)caption.textContent=config.label||label;
+  document.querySelectorAll('#f_'+key+', [name="f_'+key+'"]').forEach(el=>{el.dataset.locked=String(Boolean(config.locked));el.disabled=busy||Boolean(config.locked);});
+  const list=$('list_f_'+key);
+  if(list&&config.options!==undefined)list.innerHTML=config.options.split('\n').filter(Boolean).map(v=>'<option value="'+esc(v)+'">').join('');
+ });
+}
+function setupFeatures(){
+ document.querySelectorAll('.step').forEach((el,i)=>el.style.setProperty('--section',palette[i]));
+ $('steps').querySelectorAll('button').forEach((el,i)=>el.style.setProperty('--section',palette[i]));
+ $('adminField').innerHTML=fields.map(([key,label])=>'<option value="'+key+'">'+esc(label)+'</option>').join('');
+ function loadAdmin(){const key=$('adminField').value;const field=fields.find(f=>f[0]===key);const config=settings[key]||{};$('adminLabel').value=config.label||field[1];$('adminOptions').value=config.options??(field[3]||'').split('|').join('\n');$('adminLocked').checked=Boolean(config.locked);}
+ $('adminField').onchange=loadAdmin;loadAdmin();applySettings();
+ $('applyAdmin').onclick=()=>{const key=$('adminField').value;settings[key]={label:$('adminLabel').value.trim(),options:$('adminOptions').value,locked:$('adminLocked').checked};try{localStorage.setItem('arqueodex_fields',JSON.stringify(settings));applySettings();status('Configuración guardada.');}catch(e){status(e.message,true);}};
+ $('password').onclick=async()=>{try{const old=localStorage.getItem('arqueodex_password');if(old){const current=prompt('Contraseña actual');if(current===null)return;if(await passwordHash(current)!==old)throw Error('Contraseña incorrecta.');}const value=prompt('Nueva contraseña de al menos 6 caracteres');if(value===null)return;if(value.length<6)throw Error('Usa al menos 6 caracteres.');if(prompt('Repite la contraseña')!==value)throw Error('Las contraseñas no coinciden.');localStorage.setItem('arqueodex_password',await passwordHash(value));status('Contraseña guardada en este navegador.');}catch(e){status(e.message,true);}};
+ $('gate').addEventListener('cancel',e=>e.preventDefault());
+ $('lockApp').onclick=()=>{if(!localStorage.getItem('arqueodex_password')){show('control');status('Crea una contraseña para activar el bloqueo.');return;}$('unlockPassword').value='';$('unlockError').textContent='';$('gate').showModal();};
+ $('unlockForm').onsubmit=async e=>{e.preventDefault();try{if(await passwordHash($('unlockPassword').value)===localStorage.getItem('arqueodex_password'))$('gate').close();else $('unlockError').textContent='Contraseña incorrecta.';}catch(error){$('unlockError').textContent=error.message;}};
+ if(localStorage.getItem('arqueodex_password'))$('lockApp').click();
+ $('excel').onclick=exportXlsx;
+}
+
 init();
+setupFeatures();
+if('serviceWorker' in navigator && location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
 </html>
+
